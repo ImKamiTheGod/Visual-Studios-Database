@@ -1,0 +1,116 @@
+Create a SQL Server Database:
+Open SQL Server Management Studio (SSMS) and create a new database. Create a table named Customers with columns like CustomerID, Name, Email, and Phone.
+
+Create a Windows Forms Application:
+Open Visual Studio, create a new Windows Forms Application, and design your form with TextBoxes for customer information, a DataGridView to display data, and buttons for actions.
+
+Add a DataSet:
+Follow the previous instructions to add a DataSet and configure a TableAdapter for the Customers table.
+
+Code for Form:
+Implement code in your form's code-behind for data operations. Below is an example with comments explaining each part.
+
+csharp
+Copy code
+using System;
+using System.Data;
+using System.Windows.Forms;
+
+namespace CustomerDatabaseApp
+{
+    public partial class MainForm : Form
+    {
+        private CustomerDataSetTableAdapters.CustomersTableAdapter customersTableAdapter;
+        private BindingSource bindingSource;
+
+        public MainForm()
+        {
+            InitializeComponent();
+            customersTableAdapter = new CustomerDataSetTableAdapters.CustomersTableAdapter();
+            bindingSource = new BindingSource();
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            // Load data into the DataGridView
+            customersTableAdapter.Fill(customerDataSet.Customers);
+            bindingSource.DataSource = customerDataSet.Customers;
+            dataGridView1.DataSource = bindingSource;
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            // Perform data validation before adding a new customer
+            if (ValidateInput())
+            {
+                // Add a new customer to the database
+                customersTableAdapter.Insert(txtName.Text, txtEmail.Text, txtPhone.Text);
+
+                // Refresh the DataGridView
+                customersTableAdapter.Fill(customerDataSet.Customers);
+            }
+        }
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            // Perform data validation before updating a customer
+            if (ValidateInput())
+            {
+                // Update the selected customer in the database
+                int selectedCustomerId = GetSelectedCustomerId();
+                customersTableAdapter.UpdateById(txtName.Text, txtEmail.Text, txtPhone.Text, selectedCustomerId);
+
+                // Refresh the DataGridView
+                customersTableAdapter.Fill(customerDataSet.Customers);
+            }
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            // Delete the selected customer from the database
+            int selectedCustomerId = GetSelectedCustomerId();
+            customersTableAdapter.DeleteById(selectedCustomerId);
+
+            // Refresh the DataGridView
+            customersTableAdapter.Fill(customerDataSet.Customers);
+        }
+
+        private bool ValidateInput()
+        {
+            // Validate email format
+            if (!IsValidEmail(txtEmail.Text))
+            {
+                MessageBox.Show("Invalid email address.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            // Add more validation rules as needed
+
+            return true;
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            // Simple email validation using System.Net.Mail
+            try
+            {
+                var mailAddress = new System.Net.Mail.MailAddress(email);
+                return mailAddress.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private int GetSelectedCustomerId()
+        {
+            // Get the CustomerID of the selected row in the DataGridView
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                return Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["CustomerID"].Value);
+            }
+            return -1;
+        }
+    }
+}
