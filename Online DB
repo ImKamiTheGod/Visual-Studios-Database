@@ -8,7 +8,7 @@ Add a DataSet:
 Follow the previous instructions to add a DataSet and configure a TableAdapter for the Customers table.
 
 Code for Form:
-Implement code in your form's code-behind for data operations. Below is an example with comments explaining each part.
+Implement code in your form's code-behind for data operations.
 
 csharp
 Copy code
